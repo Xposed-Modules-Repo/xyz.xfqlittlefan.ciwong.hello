@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="ie=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1"
+          name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="yes" name="apple-touch-fullscreen"/>
+    <meta content="telephone=no" name="format-detection"/>
+    <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+    <meta content="telephone=no" name="format-detection"/>
+    <meta content="no" name="msapplication-tap-highlight"/>
+    <title>在线作答</title>
+    <!--清除缓存-->
+    <meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control"/>
+    <meta content="no-cache" http-equiv="Pragma"/>
+    <meta content="0" http-equiv="Expires"/>
+    <!--本地缓存记录过多则清除缓存-->
+    <script>
+        if(window.localStorage && window.localStorage.length>15) {window.localStorage.clear();location.href = location.href;}
+    </script>
+    <link href="common/css/common.css?v=6.3.46" rel="stylesheet" type="text/css">
+    <link href="css/paper.css?v=6.3.46" rel="stylesheet" type="text/css">
+    <link href="common/js/swiper/swiper.min.css" rel="stylesheet"/>
+</head>
+
+<body>
+<script>
+        if (!(/ipad|iphone/i.test(navigator.userAgent))) {
+            var body = document.getElementsByTagName('body')[0]
+            body.setAttribute('class', (body.getAttribute('class') || '') + ' device-android')
+        }
+
+
+</script>
+<div class="loading">
+    <div class="load-inner">
+        <img alt="" src="common/images/loading.gif" style="display:none">
+        <span>加载中...</span>
+    </div>
+</div>
+<!--loading end-->
+<div class="dialog" style="display:none;">
+    <div class="dialog-inner"><span>暂无信息~</span>
+    </div>
+</div>
+<!--dialog end-->
+<div class="m-error" style="display:none;">
+    <div class="m-error_inner">
+        <div class="u-img1"></div>
+        <div class="u-img2"></div>
+        <div class="f-btn mt20" onclick="javascript:location.reload()">重 试</div>
+        <div class="u-txt mt30" onclick="$(this).css('opacity',1)"></div>
+    </div>
+</div>
+<!--error end-->
+
+<div class="wrap word-wrap" id="app" style="display:none;">
+    <div class="banner" id="topNav">
+        <div class="btn-exit" id="exitOnline"><img src="images/back.png"
+                                                   style="width: 0.18rem;height: 0.3rem;padding-top: 0.3rem;">
+        </div>
+        <div class="unitTitle" v-html="examInfo.title"></div>
+        <div class="backCard" id="backCard"><img src="images/card.png"
+                                                 style="width: 0.35rem;height: 0.34rem;padding-top: 0.3rem;">
+        </div>
+        <div class="top-tips hidetext">系统已保存上次记录，你将继续上次的学习</div>
+    </div>
+    <div class="body-main" id="body-main">
+        <!-- parts -->
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <!-- 综述视频 -->
+                <div :data-level="1" class="pt30 swiper-slide this-is-prev-slide"
+                     v-if="examInfo.videoReview && examInfo.videoReview.videoUnique">
+                    <div>
+                        <div class="video pr mt30 mlr30 pb50">
+                            <video :poster="examInfo.videoReview.coverUrl || '../images/defaultVideoImg.png'"
+                                   :src="examInfo.videoReview.videoUnique | getVideoUniqueSrc"
+                                   controls playsinline="true"
+                                   v-if="examInfo.videoReview.videoUnique.indexOf(\'letv://\')>-1"
+                                   webkit-playsinline="true" x-webkit-airplay="true" x5-playsinline
+                                   x5-video-player-fullscreen="true"></video>
+                            <video :poster="examInfo.videoReview.coverUrl || '../images/defaultVideoImg.png'"
+                                   :src="examInfo.videoReview.videoUnique" controls
+                                   playsinline="true" v-else webkit-playsinline="true"
+                                   x-webkit-airplay="true" x5-playsinline
+                                   x5-video-player-fullscreen="true"></video>
+                        </div>
+                        <div><img class="hand-tip" src="images/hand.png"></div>
+                    </div>
+                </div>
+
+                <div :data-isProblems="question.qtype==4||question.qtype==5||question.qtype==10?'true':'false'"
+                     :data-level="question.level" :data-qtype="question.qtype" class="swiper-slide"
+                     v-for="question in exampaper">
+                    <div class="moduleName pt30 mlr30" v-if="question.level==1">
+                        <div v-html="question.module_description"
+                             v-if="question.module_description"></div>
+                        <span class="green prh30">|</span>
+                        <div class="inline" v-html="question.module_type_name"></div>
+                        <div><img class="hand-tip" src="images/hand.png"></div>
+                    </div>
+                    <div v-if="question.level==2">
+                        <sortline :sort="question.sort" :totalnum="totalNum"></sortline>
+                        <question :client="client" :index="$index+1" :question="question"
+                                  :questionnum="" :showrefanswers="true"></question>
+                    </div>
+                </div>
+
+                <!-- 答题卡 -->
+                <div class="card_ans pt30 swiper-slide">
+                    <div>
+                        <div class="mlr30 pb50">
+                            <div class="inline" v-for="(index,question) in exampaper">
+                                <div class="mb50" v-html="question.module_type_name"
+                                     v-if="question.level==1"></div>
+                                <div :class="question.finished?'ans_check':''" :data-index="index"
+                                     class="list-item reFormQuestion" v-if="question.level==2">
+                                    {{question.sort}}
+                                </div>
+                            </div>
+                            <p onclick="this.style.opacity=0.5;appdebug()"
+                               style="opacity:0;text-align:right;color:#ccc;">v=6.3.46</p>
+                            <p>&nbsp;</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end swiper-wrapper-->
+        </div>
+        <!-- parts end -->
+    </div>
+    <div class="question_btn">
+        <button class="green_btn flBtn" id="prevQuestion">上一题</button>
+        <button class="green_btn frBtn" id="nextQuestion">下一题</button>
+    </div>
+    <div class="submitBox">
+        <button class="sub_btn" id="submitOnline">交作业</button>
+    </div>
+</div>
+<!--app end-->
+<script>
+        var app_interaction = true; // 是否与APP交互
+
+</script>
+<!--公共js打包压缩成build-->
+<script src="common/js/build.min.js"></script>
+<!--通用函数-->
+<script src="common/js/swiper/swiper.min.js"></script>
+<script src="common/js/common.js?v=6.3.46"></script>
+<script src="common/components/online_question.js?v=6.3.46"></script>
+<script src="js/fastclick.min.js"></script>
+<script src="js/paper.js?v=6.3.47"></script>
+<!-- 音频插件 -->
+<script src="common/js/audiojs/hoasou.audio.js?v=6.3.46"></script>
+<!-- 图片放大插件 -->
+<script src="common/js/hammer.min.js"></script>
+<!--end 通用函数-->
+</body>
+
+</html>
