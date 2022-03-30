@@ -1,5 +1,8 @@
 package xyz.xfqlittlefan.ciwong.hello.throwable
 
+import androidx.annotation.Keep
+
+@Keep
 class HelloCiwongImpossibleException : Exception {
     constructor() : super()
 

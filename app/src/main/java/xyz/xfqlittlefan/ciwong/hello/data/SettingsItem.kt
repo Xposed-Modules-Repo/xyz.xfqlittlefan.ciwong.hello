@@ -1,4 +1,4 @@
-package xyz.xfqlittlefan.ciwong.hello.ui.activity.settings.data
+package xyz.xfqlittlefan.ciwong.hello.data
 
 import androidx.annotation.StringRes
 

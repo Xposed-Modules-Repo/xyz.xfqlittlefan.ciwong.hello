@@ -1,6 +1,3 @@
 <resources>
     <string name="app_name">HelloCiwong</string>
-    <string name="settings">HelloCiwong 设置</string>
-    <string name="back">返回</string>
-    <string name="function_listen_speak_title">听说模考显示答案</string>
 </resources>

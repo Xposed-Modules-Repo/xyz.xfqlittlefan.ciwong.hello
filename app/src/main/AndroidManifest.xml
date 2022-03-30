@@ -12,9 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloCiwong"
         tools:targetApi="31">
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false" />
 
         <meta-data
             android:name="xposedmodule"

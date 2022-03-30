@@ -6,4 +6,8 @@ object LogUtil {
     fun log(message: String) {
         XposedBridge.log("[HelloCiwong] $message")
     }
+
+    fun error(throwable: Throwable) {
+        XposedBridge.log(throwable)
+    }
 }
