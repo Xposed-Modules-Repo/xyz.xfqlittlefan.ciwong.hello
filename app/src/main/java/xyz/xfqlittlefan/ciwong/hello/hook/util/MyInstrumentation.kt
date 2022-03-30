@@ -22,7 +22,7 @@ class MyInstrumentation(private val mBase: Instrumentation) : Instrumentation() 
         try {
             return mBase.newActivity(cl, className, intent)
         } catch (e: Throwable) {
-            if (className != null && ActivityManager.isModuleActivity(className)) {
+            if (className != null && ActivityManager.moduleActivityList.contains(className)) {
                 return MainHooker::class.java.classLoader!!.loadClass(className)
                     .newInstance() as Activity
             }
@@ -33,7 +33,7 @@ class MyInstrumentation(private val mBase: Instrumentation) : Instrumentation() 
     override fun callActivityOnCreate(activity: Activity?, icicle: Bundle?) {
         if (activity != null && icicle != null) {
             val className = activity::class.java.name
-            if (ActivityManager.isModuleActivity(className)) {
+            if (ActivityManager.moduleActivityList.contains(className)) {
                 icicle.classLoader = MainHooker::class.java.classLoader
             }
         }
@@ -46,7 +46,7 @@ class MyInstrumentation(private val mBase: Instrumentation) : Instrumentation() 
     ) {
         if (activity != null && icicle != null) {
             val className = activity::class.java.name
-            if (ActivityManager.isModuleActivity(className)) {
+            if (ActivityManager.moduleActivityList.contains(className)) {
                 icicle.classLoader = MainHooker::class.java.classLoader
             }
         }

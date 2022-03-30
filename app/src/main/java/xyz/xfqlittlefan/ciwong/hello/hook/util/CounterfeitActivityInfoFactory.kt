@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Build
 
-
 object CounterfeitActivityInfoFactory {
     fun makeProxyActivityInfo(
         className: String,
