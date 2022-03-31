@@ -171,7 +171,6 @@ class MyInstrumentation(private val mBase: Instrumentation) : Instrumentation() 
 
     override fun callApplicationOnCreate(app: Application?) = mBase.callApplicationOnCreate(app)
 
-
     override fun newActivity(
         clazz: Class<*>?,
         context: Context?,

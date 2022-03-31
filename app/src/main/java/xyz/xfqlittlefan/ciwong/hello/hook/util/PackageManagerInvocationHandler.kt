@@ -28,7 +28,7 @@ class PackageManagerInvocationHandler(
                     null
                 }
             } else {
-                method.invoke(mTarget, args)
+                method.invoke(mTarget, *args)
             }
         } catch (ite: InvocationTargetException) {
             throw ite.targetException
