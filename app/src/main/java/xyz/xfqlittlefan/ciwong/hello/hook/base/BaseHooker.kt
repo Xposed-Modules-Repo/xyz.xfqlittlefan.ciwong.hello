@@ -1,6 +1,7 @@
 package xyz.xfqlittlefan.ciwong.hello.hook.base
 
 import android.app.Application
+import android.content.Context
 import android.content.res.XResources
 import de.robv.android.xposed.*
 import de.robv.android.xposed.callbacks.XC_InitPackageResources
@@ -19,13 +20,11 @@ open class BaseHooker : IXposedHookLoadPackage, IXposedHookInitPackageResources 
         XposedBridge.hookAllMethods(XposedHelpers.findClass(
             "com.stub.StubApp", lpparam.classLoader
         ), "attachBaseContext", object : XC_MethodHook() {
-            override fun afterHookedMethod(applicationParam: MethodHookParam?) {
-                if (applicationParam == null) return
+            override fun afterHookedMethod(contextParam: MethodHookParam?) {
+                if (contextParam == null) return
 
-                application = applicationParam.args[0] as Application
-                val classLoader = application.classLoader
-
-                this@BaseHooker.classLoader = classLoader
+                application = contextParam.thisObject as Application
+                classLoader = (contextParam.args[0] as Context).classLoader
                 onAppFullyLoaded()
             }
         })
