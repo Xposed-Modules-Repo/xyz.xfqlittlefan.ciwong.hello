@@ -28,6 +28,7 @@ class SettingsHooker : BaseHooker() {
                 val item = activity.findViewById<RelativeLayout>(-0x2)
                 item.setOnClickListener {
                     activity.startActivity(Intent(activity, SettingsActivity::class.java))
+                    LogUtil.log("Starting SettingsActivity")
                 }
             })
     }

@@ -8,7 +8,6 @@ import xyz.xfqlittlefan.ciwong.hello.util.LogUtil
 import java.lang.reflect.Field
 import java.lang.reflect.Proxy
 
-
 object Injector {
     var activityOk = false
 
@@ -16,6 +15,7 @@ object Injector {
     fun prepareActivity(application: Application) {
         if (activityOk) return
         try {
+            LogUtil.log("Processing activity... 1")
             val classActivityThread = Class.forName("android.app.ActivityThread")
             val methodCurrentActivityThread =
                 classActivityThread.getDeclaredMethod("currentActivityThread")
@@ -27,6 +27,7 @@ object Injector {
                 fieldMInstrumentation.get(currentActivityThread) as Instrumentation
             fieldMInstrumentation.set(currentActivityThread, MyInstrumentation(instrumentation))
 
+            LogUtil.log("Processing activity... 2")
             val fieldMH = classActivityThread.getDeclaredField("mH")
             fieldMH.isAccessible = true
             val mHHandler = fieldMH.get(currentActivityThread)
@@ -37,6 +38,7 @@ object Injector {
                 fieldMCallback.set(mHHandler, MyH(callback, application.classLoader))
             }
 
+            LogUtil.log("Processing activity... 3")
             var classActivityManager: Class<*>
             var fieldGDefault: Field
             try {
@@ -61,11 +63,31 @@ object Injector {
             val mInstance = fieldMInstance.get(gDefault)
             val activityManagerProxy = Proxy.newProxyInstance(
                 MainHooker::class.java.classLoader,
-                arrayOf(Class.forName("android.app.IActivityTaskManager")),
+                arrayOf(Class.forName("android.app.IActivityManager")),
                 ActivityManagerHandler(mInstance!!, application)
             )
             fieldMInstance.set(gDefault, activityManagerProxy)
 
+            LogUtil.log("Processing activity... 4")
+            try {
+                val classActivityTaskManager = Class.forName("android.app.ActivityTaskManager")
+                val fieldIActivityTaskManagerSingleton =
+                    classActivityTaskManager.getDeclaredField("IActivityTaskManagerSingleton")
+                fieldIActivityTaskManagerSingleton.isAccessible = true
+                val iActivityTaskManagerSingleton = fieldIActivityTaskManagerSingleton.get(null)
+                classSingleton.getMethod("get").invoke(iActivityTaskManagerSingleton)
+                val mDefaultTaskManager = fieldMInstance.get(iActivityTaskManagerSingleton)
+                val activityTaskManagerProxy = Proxy.newProxyInstance(
+                    MainHooker::class.java.classLoader,
+                    arrayOf(Class.forName("android.app.IActivityTaskManager")),
+                    ActivityManagerHandler(mDefaultTaskManager!!, application)
+                )
+                fieldMInstance.set(iActivityTaskManagerSingleton, activityTaskManagerProxy)
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
+
+            LogUtil.log("Processing activity... 5")
             val fieldSPackageManager = classActivityThread.getDeclaredField("sPackageManager")
             fieldSPackageManager.isAccessible = true
             val packageManagerImpl = fieldSPackageManager.get(currentActivityThread)
@@ -81,6 +103,7 @@ object Injector {
             fieldSPackageManager.set(currentActivityThread, packageManagerProxy)
             fieldMPM.set(packageManager, packageManagerProxy)
 
+            LogUtil.log("Processing activity... OK")
             activityOk = true
         } catch (e: Throwable) {
             LogUtil.error(e)
