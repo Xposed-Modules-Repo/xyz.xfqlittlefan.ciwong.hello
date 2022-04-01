@@ -1,0 +1,26 @@
+name: Android Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: 设置 JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: adopt
+          java-version: '11'
+      - name: 编译
+        run: ./gradlew assemble
+      - name: 上传
+        uses: actions/upload-artifact@v3
+        with:
+          name: ci-build
+          path: app/build/outputs
