@@ -17,6 +17,13 @@ jobs:
         with:
           distribution: adopt
           java-version: '11'
+      - name: 设置缓存
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
       - name: 编译
         run: |
           chmod +x ./gradlew

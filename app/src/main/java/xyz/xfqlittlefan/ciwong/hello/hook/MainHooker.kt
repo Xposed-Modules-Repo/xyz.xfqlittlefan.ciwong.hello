@@ -1,10 +1,11 @@
 package xyz.xfqlittlefan.ciwong.hello.hook
 
 import androidx.annotation.Keep
-import de.robv.android.xposed.XSharedPreferences
+import androidx.preference.PreferenceManager
 import de.robv.android.xposed.XposedHelpers
 import org.json.JSONObject
 import xyz.xfqlittlefan.ciwong.hello.hook.base.BaseHooker
+import xyz.xfqlittlefan.ciwong.hello.hook.util.AppPreferences
 import xyz.xfqlittlefan.ciwong.hello.hook.util.Injector
 import xyz.xfqlittlefan.ciwong.hello.throwable.HelloCiwongImpossibleException
 import xyz.xfqlittlefan.ciwong.hello.util.LogUtil
@@ -22,16 +23,17 @@ class MainHooker : BaseHooker() {
 
         Injector.prepareActivity(application)
 
-        val xSharedPreferences = XSharedPreferences("xyz.xfqlittlefan.ciwong.hello")
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application)
 
-        if (xSharedPreferences.getBoolean("settings_no_exam", true)) {
-            "com.ciwong.epaper.modules.me.bean.WorkContents".findAndHookMethod("getExamMode",
+        if (sharedPreferences.getBoolean(AppPreferences.NO_EXAM, true)) {
+            "com.ciwong.epaper.modules.me.bean.WorkContents".findAndHookMethod(
+                "getExamMode",
                 doBefore = {
                     it.result = 0
                 })
         }
 
-        if (xSharedPreferences.getBoolean("settings_show_answers_listen_speak", true)) {
+        if (sharedPreferences.getBoolean(AppPreferences.SHOW_ANSWERS_LISTEN_SPEAK, true)) {
             "com.ciwong.epaper.modules.epaper.a.b$4".findAndHookMethod(
                 "success", doBefore = { param ->
                     if ((XposedHelpers.getObjectField(
@@ -98,7 +100,7 @@ class MainHooker : BaseHooker() {
             )
         }
 
-        if (xSharedPreferences.getBoolean("settings_show_answers_online_paper", true)) {
+        if (sharedPreferences.getBoolean(AppPreferences.SHOW_ANSWERS_ONLINE_PAPER, true)) {
             "com.ciwong.epaper.util.m".findAndHookMethod("e", doAfter = {
                 LogUtil.log("Ciwong, show the answer!")
 

@@ -3,6 +3,7 @@ package xyz.xfqlittlefan.ciwong.hello.ui.settings
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.Keep
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,9 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import xyz.xfqlittlefan.ciwong.hello.ui.base.BaseActivity
-import xyz.xfqlittlefan.ciwong.hello.ui.components.HelloCiwongAppBar
+import xyz.xfqlittlefan.ciwong.hello.ui.component.HelloCiwongAppBar
 import xyz.xfqlittlefan.ciwong.hello.ui.theme.HelloCiwongTheme
 
+@Keep
 class SettingsActivity : BaseActivity() {
     private val viewModel by viewModels<SettingsViewModel>()
 
@@ -67,7 +69,7 @@ class SettingsActivity : BaseActivity() {
                             Row(modifier = Modifier
                                 .clickable {
                                     sharedPreferences.edit(commit = true) {
-                                        putBoolean("settings_${it.id}", !value)
+                                        putBoolean(it.id, !value)
                                     }
                                     value = !value
                                 }

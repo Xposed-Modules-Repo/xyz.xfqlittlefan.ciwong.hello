@@ -1,4 +1,4 @@
-package xyz.xfqlittlefan.ciwong.hello.ui.components
+package xyz.xfqlittlefan.ciwong.hello.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
