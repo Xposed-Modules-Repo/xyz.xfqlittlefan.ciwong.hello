@@ -41,6 +41,7 @@ open class BaseHooker : IXposedHookLoadPackage, IXposedHookInitPackageResources 
     fun String.findAndHookMethod(
         methodName: String,
         classLoader: ClassLoader = this@BaseHooker.classLoader,
+        condition: () -> Boolean = { true },
         doBefore: (param: XC_MethodHook.MethodHookParam) -> Unit = {},
         doAfter: (param: XC_MethodHook.MethodHookParam) -> Unit = {},
         vararg parameterTypes: Class<*>
@@ -49,7 +50,7 @@ open class BaseHooker : IXposedHookLoadPackage, IXposedHookInitPackageResources 
             XposedHelpers.findAndHookMethod(XposedHelpers.findClass(this, classLoader),
                 methodName,
                 *parameterTypes,
-                object : MethodHook() {
+                object : MethodHook(condition) {
                     override fun doBeforeHookedMethod(param: MethodHookParam) = doBefore(param)
                     override fun doAfterHookedMethod(param: MethodHookParam) = doAfter(param)
                 })

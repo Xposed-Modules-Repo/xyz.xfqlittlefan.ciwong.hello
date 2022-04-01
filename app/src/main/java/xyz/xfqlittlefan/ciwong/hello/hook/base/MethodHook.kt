@@ -2,9 +2,9 @@ package xyz.xfqlittlefan.ciwong.hello.hook.base
 
 import de.robv.android.xposed.XC_MethodHook
 
-abstract class MethodHook : XC_MethodHook() {
+abstract class MethodHook(private val condition: () -> Boolean = { true }) : XC_MethodHook() {
     override fun beforeHookedMethod(param: MethodHookParam?) {
-        if (param == null) return
+        if (!condition() || param == null) return
 
         doBeforeHookedMethod(param)
     }
@@ -12,7 +12,7 @@ abstract class MethodHook : XC_MethodHook() {
     open fun doBeforeHookedMethod(param: MethodHookParam) {}
 
     override fun afterHookedMethod(param: MethodHookParam?) {
-        if (param == null) return
+        if (!condition() || param == null) return
 
         doAfterHookedMethod(param)
     }

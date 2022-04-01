@@ -14,56 +14,44 @@ import android.os.*
 import android.view.KeyEvent
 import android.view.MotionEvent
 import xyz.xfqlittlefan.ciwong.hello.hook.MainHooker
-import xyz.xfqlittlefan.ciwong.hello.util.LogUtil
 
 @Suppress("DEPRECATION")
 @SuppressLint("NewApi")
 class MyInstrumentation(private val mBase: Instrumentation) : Instrumentation() {
     override fun newActivity(cl: ClassLoader?, className: String?, intent: Intent?): Activity {
         try {
-            val result = mBase.newActivity(cl, className, intent)
-            LogUtil.log("newActivity, 1")
-            return result
+            return mBase.newActivity(cl, className, intent)
         } catch (e: Throwable) {
             if (className != null && ActivityManager.moduleActivityList.contains(className)) {
-                val result = MainHooker::class.java.classLoader!!.loadClass(className)
+                return MainHooker::class.java.classLoader!!.loadClass(className)
                     .newInstance() as Activity
-                LogUtil.log("newActivity, 2")
-                return result
             }
-            LogUtil.log("newActivity, 3")
             throw e
         }
     }
 
     override fun callActivityOnCreate(activity: Activity?, icicle: Bundle?) {
         if (activity != null && icicle != null) {
-            LogUtil.log("callActivityOnCreate1, 1")
             val className = activity::class.java.name
             if (ActivityManager.moduleActivityList.contains(className)) {
                 icicle.classLoader = MainHooker::class.java.classLoader
-                LogUtil.log("callActivityOnCreate1, 2")
             }
         }
         //Inject Resources Here
         mBase.callActivityOnCreate(activity, icicle)
-        LogUtil.log("callActivityOnCreate1, 3")
     }
 
     override fun callActivityOnCreate(
         activity: Activity?, icicle: Bundle?, persistentState: PersistableBundle?
     ) {
         if (activity != null && icicle != null) {
-            LogUtil.log("callActivityOnCreate2, 1")
             val className = activity::class.java.name
             if (ActivityManager.moduleActivityList.contains(className)) {
                 icicle.classLoader = MainHooker::class.java.classLoader
-                LogUtil.log("callActivityOnCreate2, 2")
             }
         }
         //Inject Resources Here
         mBase.callActivityOnCreate(activity, icicle, persistentState)
-        LogUtil.log("callActivityOnCreate2, 3")
     }
 
     override fun onCreate(arguments: Bundle?) = mBase.onCreate(arguments)
