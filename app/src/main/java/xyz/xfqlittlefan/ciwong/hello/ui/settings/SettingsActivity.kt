@@ -32,7 +32,6 @@ class SettingsActivity : BaseActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.setCompatDecorFitsSystemWindows(false)
         setContent {
             HelloCiwongTheme {
                 Scaffold(topBar = {
@@ -62,7 +61,7 @@ class SettingsActivity : BaseActivity() {
                             var value by remember {
                                 mutableStateOf(
                                     sharedPreferences.getBoolean(
-                                        "settings_${it.id}", true
+                                        it.id, true
                                     )
                                 )
                             }

@@ -14,11 +14,13 @@ object CounterfeitActivityInfoFactory {
     ): ActivityInfo? {
         return try {
             try {
-                val proto: ActivityInfo = application.packageManager.getActivityInfo(
-                    ComponentName(
-                        application.packageName, "com.ciwong.epaper.modules.me.ui.SettingActivity"
-                    ), flags.toInt()
-                )
+                @Suppress("DEPRECATION") val proto: ActivityInfo =
+                    application.packageManager.getActivityInfo(
+                        ComponentName(
+                            application.packageName,
+                            "com.ciwong.epaper.modules.me.ui.SettingActivity"
+                        ), flags.toInt()
+                    )
                 initCommon(proto, className)
             } catch (e: PackageManager.NameNotFoundException) {
                 throw IllegalStateException(
