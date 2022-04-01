@@ -94,30 +94,69 @@ class MainHooker : BaseHooker() {
             }
 
             val result = info.toString()
-            LogUtil.log("Listen speak exam process finished! Result: $result")
+            LogUtil.log("Listen speak exam process finished!")
             param.args[0] = result
 
         }, parameterTypes = arrayOf(Any::class.java)
         )
 
 
-        "com.ciwong.epaper.util.m".findAndHookMethod("e", condition = {
-            sharedPreferences.getBoolean(
-                AppPreferences.SHOW_ANSWERS_ONLINE_PAPER, true
-            )
-        }, doAfter = {
-            LogUtil.log("Ciwong, show the answer!")
-
+        "com.ciwong.epaper.util.m".findAndHookMethod("e", doAfter = {
             val thisClassLoader =
                 this@MainHooker::class.java.classLoader ?: throw HelloCiwongImpossibleException(
                     "HelloCiwong has got a strange problem 0x1."
                 )
 
-            thisClassLoader.getResourceAsStream("assets/paper.html")
-                .copyTo(FileOutputStream("${it.result as String}${File.separator}paper.html"))
-            thisClassLoader.getResourceAsStream("assets/online_question.js")
-                .copyTo(FileOutputStream("${it.result as String}${File.separator}common${File.separator}components${File.separator}online_question.js"))
+            val pathPaperDotHtml = "${it.result as String}${File.separator}paper.html"
+            val pathOnlineQuestionDotJs =
+                "${it.result as String}${File.separator}common${File.separator}components${File.separator}online_question.js"
 
+            if (sharedPreferences.getBoolean(
+                    AppPreferences.SHOW_ANSWERS_ONLINE_PAPER, true
+                )
+            ) {
+                LogUtil.log("Ciwong, show the answer!")
+                if (!File("$pathPaperDotHtml.original").exists()) {
+                    LogUtil.log("paper.html not found, replacing...")
+                    File(pathPaperDotHtml).renameTo(File("$pathPaperDotHtml.original"))
+                    thisClassLoader.getResourceAsStream("assets/paper.html")
+                        .copyTo(FileOutputStream(pathPaperDotHtml))
+                    LogUtil.log("paper.html has been successfully replaced!")
+                }
+
+                if (!File("$pathOnlineQuestionDotJs.original").exists()) {
+                    LogUtil.log("online_question.js not found, replacing...")
+                    File(pathOnlineQuestionDotJs).renameTo(File("$pathOnlineQuestionDotJs.original"))
+                    thisClassLoader.getResourceAsStream("assets/online_question.js")
+                        .copyTo(FileOutputStream(pathOnlineQuestionDotJs))
+                    LogUtil.log("online_question.js has been successfully replaced!")
+                }
+            } else {
+                LogUtil.log("Ciwong, don't show the answer... 😣")
+                if (File("$pathPaperDotHtml.original").exists()) {
+                    LogUtil.log("Please don't give me the replaced paper.html...")
+                    val delete = File(pathPaperDotHtml).delete()
+                    val rename = File("$pathPaperDotHtml.original").renameTo(File(pathPaperDotHtml))
+                    if (!delete || !rename) {
+                        LogUtil.log("Something went wrong when restoring paper.html. delete: $delete, rename: $rename.")
+                    } else {
+                        LogUtil.log("paper.html has been successfully restored.")
+                    }
+                }
+
+                if (File("$pathOnlineQuestionDotJs.original").exists()) {
+                    LogUtil.log("Please don't give me the replaced online_question.js...")
+                    val delete = File(pathOnlineQuestionDotJs).delete()
+                    val rename = File("$pathOnlineQuestionDotJs.original").renameTo(
+                        File(pathOnlineQuestionDotJs)
+                    )
+                    if (!delete || !rename) {
+                        LogUtil.log("Something went wrong when restoring online_question.js. delete: $delete, rename: $rename.")
+                    } else {
+                        LogUtil.log("online_question.js has been successfully restored.")
+                    }
+                }
+            }
         })
     }
 }
