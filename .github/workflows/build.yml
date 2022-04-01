@@ -18,7 +18,9 @@ jobs:
           distribution: adopt
           java-version: '11'
       - name: 编译
-        run: ./gradlew assemble
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assemble
       - name: 上传
         uses: actions/upload-artifact@v3
         with:
